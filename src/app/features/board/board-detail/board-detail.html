@@ -1,1 +1,132 @@
-<p>board-detail works!</p>
+<div class="min-h-screen bg-gray-100 flex flex-col">
+
+  <!-- Navbar -->
+  <nav class="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4 shadow-sm">
+    <button mat-icon-button (click)="goBack()" matTooltip="Voltar">
+      <mat-icon class="text-gray-500">arrow_back</mat-icon>
+    </button>
+    <div class="flex items-center gap-3 flex-1">
+      <mat-icon style="color: #2563eb;">dashboard</mat-icon>
+      <div>
+        <h1 class="text-lg font-bold text-gray-900 leading-none">{{ board()?.title }}</h1>
+        @if (board()?.description) {
+          <p class="text-gray-500 text-xs mt-0.5">{{ board()?.description }}</p>
+        }
+      </div>
+    </div>
+    <button
+      mat-stroked-button
+      style="border-radius: 10px;"
+      (click)="addColumn()">
+      <mat-icon>view_column</mat-icon>
+      Nova Coluna
+    </button>
+  </nav>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex justify-center items-center flex-1">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  <!-- Kanban Board -->
+  @if (!loading()) {
+    <div class="flex gap-5 p-6 overflow-x-auto flex-1 items-start">
+
+      @for (column of columns(); track column.id) {
+        <div class="flex-shrink-0 w-72 bg-gray-200 rounded-2xl overflow-hidden">
+
+          <!-- Column Header -->
+          <div class="px-4 py-3 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-800 text-sm">{{ column.title }}</h3>
+            <div class="flex items-center gap-1">
+              <span class="bg-gray-300 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">
+                {{ getTasksForColumn(column.id).length }}
+              </span>
+              <button
+                mat-icon-button
+                style="width: 28px; height: 28px;"
+                (click)="deleteColumn(column.id, $event)"
+                matTooltip="Remover coluna">
+                <mat-icon class="text-gray-400 hover:text-red-500" style="font-size: 16px;">delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tasks Drop Zone -->
+          <div
+            class="px-3 pb-3 flex flex-col gap-2 min-h-16"
+            cdkDropList
+            [id]="column.id"
+            [cdkDropListData]="getTasksForColumn(column.id)"
+            [cdkDropListConnectedTo]="getColumnIds()"
+            (cdkDropListDropped)="onTaskDrop($event, column)">
+
+            @for (task of getTasksForColumn(column.id); track task.id) {
+              <div
+                class="bg-white rounded-xl p-3 shadow-sm cursor-grab active:cursor-grabbing group hover:shadow-md transition-shadow"
+                cdkDrag>
+
+                <div class="flex items-start justify-between gap-2">
+                  <p class="text-sm font-medium text-gray-800 flex-1">{{ task.title }}</p>
+                  <button
+                    mat-icon-button
+                    class="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                    style="width: 24px; height: 24px;"
+                    (click)="deleteTask(column.id, task.id, $event)">
+                    <mat-icon class="text-gray-300 hover:text-red-400" style="font-size: 14px;">close</mat-icon>
+                  </button>
+                </div>
+
+                @if (task.description) {
+                  <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ task.description }}</p>
+                }
+
+                @if (task.dueDate) {
+                  <div class="flex items-center gap-1 mt-2">
+                    <mat-icon class="text-gray-400" style="font-size: 12px;">schedule</mat-icon>
+                    <span class="text-xs text-gray-400">{{ task.dueDate | date: 'dd/MM/yyyy' }}</span>
+                  </div>
+                }
+
+              </div>
+            }
+
+          </div>
+
+          <!-- Add Task Button -->
+          <div class="px-3 pb-3">
+            <button
+              class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-gray-500 hover:bg-gray-300 hover:text-gray-700 transition-colors text-sm"
+              (click)="addTask(column.id)">
+              <mat-icon style="font-size: 16px; width: 16px; height: 16px;">add</mat-icon>
+              Adicionar tarefa
+            </button>
+          </div>
+
+        </div>
+      }
+
+      <!-- Add Column Button -->
+      @if (columns().length === 0) {
+        <div class="flex flex-col items-center justify-center flex-1 py-24 text-center">
+          <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
+            <mat-icon style="font-size: 32px; width: 32px; height: 32px; color: #2563eb;">view_column</mat-icon>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-700 mb-2">Nenhuma coluna ainda</h3>
+          <p class="text-gray-500 mb-4 text-sm">Adicione colunas para organizar suas tarefas</p>
+          <button
+            mat-flat-button
+            style="background-color: #2563eb; color: white; border-radius: 10px;"
+            (click)="addColumn()">
+            <mat-icon>add</mat-icon>
+            Adicionar coluna
+          </button>
+        </div>
+      }
+
+    </div>
+  }
+
+</div>
