@@ -1,1 +1,115 @@
-<p>board-list works!</p>
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Navbar -->
+  <nav class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <mat-icon style="color: #2563eb; font-size: 32px; width: 32px; height: 32px;">dashboard</mat-icon>
+      <span class="text-xl font-bold text-gray-900">Kanban</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-semibold">
+          {{ userName.charAt(0).toUpperCase() }}
+        </div>
+        <span class="text-gray-700 text-sm font-medium hidden sm:block">{{ userName }}</span>
+      </div>
+      <button mat-icon-button (click)="logout()" matTooltip="Sair">
+        <mat-icon class="text-gray-500">logout</mat-icon>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Meus Boards</h1>
+        <p class="text-gray-500 text-sm mt-1">Gerencie todos os seus projetos</p>
+      </div>
+      <button
+        mat-flat-button
+        style="background-color: #2563eb; color: white; border-radius: 12px; height: 44px; padding: 0 20px;"
+        (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Novo Board
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex justify-center items-center py-24">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (!loading() && boards().length === 0) {
+      <div class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+          <mat-icon style="font-size: 40px; width: 40px; height: 40px; color: #2563eb;">dashboard</mat-icon>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Nenhum board ainda</h3>
+        <p class="text-gray-500 mb-6 max-w-sm">Crie seu primeiro board e comece a organizar seus projetos</p>
+        <button
+          mat-flat-button
+          style="background-color: #2563eb; color: white; border-radius: 12px; height: 44px; padding: 0 24px;"
+          (click)="openCreateDialog()">
+          <mat-icon>add</mat-icon>
+          Criar primeiro board
+        </button>
+      </div>
+    }
+
+    <!-- Boards grid -->
+    @if (!loading() && boards().length > 0) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
+        @for (board of boards(); track board.id) {
+          <div
+            class="bg-white rounded-2xl border border-gray-200 p-6 cursor-pointer hover:shadow-md hover:border-blue-200 transition-all duration-200 group relative"
+            (click)="openBoard(board.id)">
+
+            <!-- Board color accent -->
+            <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center mb-4">
+              <mat-icon class="text-white" style="font-size: 20px; width: 20px; height: 20px;">dashboard</mat-icon>
+            </div>
+
+            <h3 class="font-semibold text-gray-900 text-base mb-1 truncate">{{ board.title }}</h3>
+            @if (board.description) {
+              <p class="text-gray-500 text-sm truncate">{{ board.description }}</p>
+            }
+
+            <div class="flex items-center justify-between mt-4">
+              <span class="text-xs text-gray-400">
+                {{ board.createdAt | date: 'dd/MM/yyyy' }}
+              </span>
+              <button
+                mat-icon-button
+                class="opacity-0 group-hover:opacity-100 transition-opacity"
+                style="width: 32px; height: 32px;"
+                (click)="deleteBoard(board.id, $event)"
+                matTooltip="Remover board">
+                <mat-icon class="text-gray-400 hover:text-red-500" style="font-size: 18px;">delete</mat-icon>
+              </button>
+            </div>
+
+          </div>
+        }
+
+        <!-- Card criar novo board -->
+        <div
+          class="bg-white rounded-2xl border-2 border-dashed border-gray-200 p-6 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 flex flex-col items-center justify-center gap-3 min-h-40"
+          (click)="openCreateDialog()">
+          <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+            <mat-icon class="text-gray-400" style="font-size: 20px; width: 20px; height: 20px;">add</mat-icon>
+          </div>
+          <span class="text-gray-500 text-sm font-medium">Novo board</span>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>

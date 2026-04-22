@@ -1,0 +1,53 @@
+<div class="p-6 w-full" style="min-width: 400px;">
+
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-bold text-gray-900">
+      {{ data?.title ? 'Editar Board' : 'Novo Board' }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()">
+      <mat-icon class="text-gray-400">close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Título</mat-label>
+      <input matInput formControlName="title" placeholder="Ex: Projeto Frontend">
+      @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
+        <mat-error>Título é obrigatório</mat-error>
+      }
+      @if (form.get('title')?.hasError('maxlength') && form.get('title')?.touched) {
+        <mat-error>Máximo 100 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Descrição (opcional)</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Descreva o objetivo do board"
+        rows="3">
+      </textarea>
+    </mat-form-field>
+
+    <div class="flex gap-3 justify-end mt-2">
+      <button
+        mat-stroked-button
+        type="button"
+        style="border-radius: 10px;"
+        (click)="onCancel()">
+        Cancelar
+      </button>
+      <button
+        mat-flat-button
+        type="submit"
+        style="background-color: #2563eb; color: white; border-radius: 10px;"
+        [disabled]="form.invalid">
+        {{ data?.title ? 'Salvar' : 'Criar Board' }}
+      </button>
+    </div>
+
+  </form>
+</div>
