@@ -16,8 +16,6 @@ import {
 export class AuthService {
   private readonly API_URL = 'http://localhost:8080/auth';
 
-  // Signal que guarda os dados do usuario logado
-  // null = nao logado
   currentUser = signal<AuthResponse | null>(this.loadUserFromStorage());
 
   constructor(
@@ -60,7 +58,6 @@ export class AuthService {
     return !!localStorage.getItem('accessToken');
   }
 
-  // Salva a sessao no localStorage apos login/registro
   private saveSession(response: AuthResponse): void {
     localStorage.setItem('accessToken', response.accessToken);
     localStorage.setItem('refreshToken', response.refreshToken);
@@ -68,7 +65,6 @@ export class AuthService {
     this.currentUser.set(response);
   }
 
-  // Carrega o usuario do localStorage ao iniciar o app
   private loadUserFromStorage(): AuthResponse | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
